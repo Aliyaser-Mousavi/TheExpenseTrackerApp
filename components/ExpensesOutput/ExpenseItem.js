@@ -3,25 +3,27 @@ import { GlobalStyles } from "../../constants/style";
 import { getFormattedDate } from "../../util/date";
 import { useNavigation } from "@react-navigation/native";
 
+const colors = GlobalStyles.colors;
+
 const ExpenseItem = ({ description, amount, date, id }) => {
   const navigation = useNavigation();
+
   function expensePressHandler() {
     navigation.navigate("ManageExpense", { expenseId: id });
   }
+
   return (
     <Pressable
       onPress={expensePressHandler}
       style={({ pressed }) => pressed && styles.pressed}
     >
       <View style={styles.expenseItem}>
-        <View>
-          <Text style={[styles.textBase, styles.description]}>
-            {description}
-          </Text>
-          <Text style={styles.textBase}>{getFormattedDate(date)}</Text>
+        <View style={styles.descriptionContainer}>
+          <Text style={styles.description}>{description}</Text>
+          <Text style={styles.dateText}>{getFormattedDate(date)}</Text>
         </View>
         <View style={styles.amountContainer}>
-          <Text style={styles.amount}>{amount.toFixed(2)}</Text>
+          <Text style={styles.amount}>${amount.toFixed(2)}</Text>
         </View>
       </View>
     </Pressable>
@@ -29,44 +31,53 @@ const ExpenseItem = ({ description, amount, date, id }) => {
 };
 
 export default ExpenseItem;
-const colors = GlobalStyles.colors;
 
 const styles = StyleSheet.create({
   pressed: {
-    opacity: 0.75,
+    opacity: 0.7,
+    transform: [{ scale: 0.98 }],
   },
   expenseItem: {
-    padding: 12,
-    marginVertical: 8,
-    backgroundColor: colors.primary500,
+    padding: 16,
+    marginVertical: 10,
+    backgroundColor: colors.primary700,
     flexDirection: "row",
     justifyContent: "space-between",
-    borderRadius: 6,
-    elevation: 3,
+    alignItems: "center",
+    borderRadius: 16,
+    elevation: 4,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
-  textBase: {
-    color: colors.primary50,
+  descriptionContainer: {
+    flex: 1,
   },
   description: {
-    fontSize: 16,
-    marginBottom: 4,
-    fontWeight: "bold",
+    fontSize: 17,
+    marginBottom: 6,
+    fontWeight: "600",
+    color: "white",
+  },
+  dateText: {
+    fontSize: 13,
+    color: colors.primary200,
   },
   amountContainer: {
     paddingHorizontal: 12,
-    paddingVertical: 4,
-    backgroundColor: "white",
+    paddingVertical: 8,
+    backgroundColor: colors.primary800,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 4,
-    minWidth: 80,
+    borderRadius: 12,
+    minWidth: 90,
+    borderWidth: 1,
+    borderColor: colors.accent500,
   },
   amount: {
-    color: colors.primary500,
+    color: colors.accent500,
     fontWeight: "bold",
+    fontSize: 15,
   },
 });

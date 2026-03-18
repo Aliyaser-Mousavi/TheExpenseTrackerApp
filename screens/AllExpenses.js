@@ -7,8 +7,8 @@ const AllExpenses = () => {
   return (
     <ExpensesOutput
       expenses={expensesCtx.expenses}
-      expensesPeriod="Total"
-      fallbackText="No registered expenses found!!!"
+      expensesPeriod="Total Balance"
+      fallbackText="No expenses recorded yet."
     />
   );
 };

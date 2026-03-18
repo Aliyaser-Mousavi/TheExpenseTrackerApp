@@ -1,5 +1,9 @@
 export function getFormattedDate(date) {
-  return date.toISOString().slice(0, 10);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 }
 
 export function getDateMinusDays(date, days) {
