@@ -1,4 +1,4 @@
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, PlatformColor } from "react-native";
 import { useState } from "react";
 import Input from "./Input";
 import Button from "../UI/Button";
@@ -81,6 +81,7 @@ const ExpenseForm = ({
           textInputConfig={{
             keyboardType: "decimal-pad",
             placeholder: "0.00",
+            placeholderTextColor: "gray",
             onChangeText: inputChangedHandler.bind(this, "amount"),
             value: inputs.amount.value,
           }}
@@ -92,6 +93,7 @@ const ExpenseForm = ({
           textInputConfig={{
             placeholder: "YYYY-MM-DD",
             maxLength: 10,
+            placeholderTextColor: "gray",
             onChangeText: inputChangedHandler.bind(this, "date"),
             value: inputs.date.value,
           }}
@@ -103,6 +105,7 @@ const ExpenseForm = ({
         textInputConfig={{
           placeholder: "What was this for?",
           multiline: true,
+          placeholderTextColor: "gray",
           autoCorrect: false,
           onChangeText: inputChangedHandler.bind(this, "description"),
           value: inputs.description.value,
