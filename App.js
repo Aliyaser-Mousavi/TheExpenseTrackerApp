@@ -9,6 +9,8 @@ import ManageExpense from "./screens/ManageExpense";
 import { GlobalStyles } from "./constants/style";
 import IconButton from "./components/UI/IconButton";
 import ExpensesContextProvider from "./store/expenses-context";
+import { useState } from "react";
+import CustomSplashScreen from "./components/UI/SplashScreen";
 
 const Stack = createNativeStackNavigator();
 const BottomTabs = createBottomTabNavigator();
@@ -81,6 +83,10 @@ function ExpensesOverview() {
 }
 
 export default function App() {
+  const [isAppReady, setIsAppReady] = useState(false);
+  if (!isAppReady) {
+    return <CustomSplashScreen onFinish={() => setIsAppReady(true)} />;
+  }
   return (
     <>
       <StatusBar style="light" />
