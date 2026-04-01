@@ -3,6 +3,7 @@ import { StyleSheet, View } from "react-native";
 import IconButton from "../components/UI/IconButton";
 import { GlobalStyles } from "../constants/style";
 import { ExpensesContext } from "../store/expenses-context";
+import { AuthContext } from "../store/auth-context";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
 import { deleteExpense, storeExpense, updateExpense } from "../util/http";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
@@ -13,7 +14,9 @@ const colors = GlobalStyles.colors;
 const ManageExpenses = ({ route, navigation }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState();
+
   const expensesCtx = useContext(ExpensesContext);
+  const authCtx = useContext(AuthContext);
 
   const editedExpenseId = route.params?.expenseId;
   const isEditing = !!editedExpenseId;
@@ -38,7 +41,7 @@ const ManageExpenses = ({ route, navigation }) => {
   async function deleteExpenseHandler() {
     setIsSubmitting(true);
     try {
-      await deleteExpense(editedExpenseId);
+      await deleteExpense(editedExpenseId, authCtx.token, authCtx.userId);
       expensesCtx.deleteExpense(editedExpenseId);
       navigation.goBack();
     } catch (error) {
@@ -56,9 +59,18 @@ const ManageExpenses = ({ route, navigation }) => {
     try {
       if (isEditing) {
         expensesCtx.updateExpense(editedExpenseId, expenseData);
-        await updateExpense(editedExpenseId, expenseData);
+        await updateExpense(
+          editedExpenseId,
+          expenseData,
+          authCtx.token,
+          authCtx.userId,
+        );
       } else {
-        const id = await storeExpense(expenseData);
+        const id = await storeExpense(
+          expenseData,
+          authCtx.token,
+          authCtx.userId,
+        );
         expensesCtx.addExpense({ ...expenseData, id: id });
       }
       navigation.goBack();

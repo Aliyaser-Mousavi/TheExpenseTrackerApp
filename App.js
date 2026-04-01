@@ -1,22 +1,70 @@
+import { useContext, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
+
 import RecentExpenses from "./screens/RecentExpenses";
 import AllExpenses from "./screens/AllExpenses";
 import ManageExpense from "./screens/ManageExpense";
+import LoginScreen from "./screens/LoginScreen";
+import SignupScreen from "./screens/SignupScreen";
+
 import { GlobalStyles } from "./constants/style";
 import IconButton from "./components/UI/IconButton";
 import ExpensesContextProvider from "./store/expenses-context";
-import { useState } from "react";
+import AuthContextProvider, { AuthContext } from "./store/auth-context";
 import CustomSplashScreen from "./components/UI/SplashScreen";
 
 const Stack = createNativeStackNavigator();
 const BottomTabs = createBottomTabNavigator();
 const colors = GlobalStyles.colors;
 
+function AuthStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: colors.primary500 },
+        headerTintColor: "white",
+        contentStyle: { backgroundColor: colors.primary700 },
+      }}
+    >
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Signup" component={SignupScreen} />
+    </Stack.Navigator>
+  );
+}
+
+function AuthenticatedStack() {
+  const authCtx = useContext(AuthContext);
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: colors.primary500 },
+        headerTintColor: "white",
+        animation: "slide_from_bottom",
+      }}
+    >
+      <Stack.Screen
+        name="ExpensesOverview"
+        component={ExpensesOverview}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ManageExpense"
+        component={ManageExpense}
+        options={{
+          presentation: "modal",
+          title: "Manage Expense",
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
 function ExpensesOverview() {
+  const authCtx = useContext(AuthContext);
   return (
     <BottomTabs.Navigator
       screenOptions={({ navigation }) => ({
@@ -36,6 +84,14 @@ function ExpensesOverview() {
         },
         tabBarActiveTintColor: colors.accent500,
         tabBarInactiveTintColor: colors.primary200,
+        headerLeft: ({ tintColor }) => (
+          <IconButton
+            icon="exit"
+            color={tintColor}
+            size={24}
+            onPress={authCtx.logout}
+          />
+        ),
         headerRight: ({ tintColor }) => (
           <IconButton
             icon="add-circle"
@@ -82,39 +138,32 @@ function ExpensesOverview() {
   );
 }
 
+function Navigation() {
+  const authCtx = useContext(AuthContext);
+
+  return (
+    <NavigationContainer>
+      {!authCtx.isAuthenticated && <AuthStack />}
+      {authCtx.isAuthenticated && <AuthenticatedStack />}
+    </NavigationContainer>
+  );
+}
+
 export default function App() {
   const [isAppReady, setIsAppReady] = useState(false);
+
   if (!isAppReady) {
     return <CustomSplashScreen onFinish={() => setIsAppReady(true)} />;
   }
+
   return (
     <>
       <StatusBar style="light" />
-      <ExpensesContextProvider>
-        <NavigationContainer>
-          <Stack.Navigator
-            screenOptions={{
-              headerStyle: { backgroundColor: colors.primary500 },
-              headerTintColor: "white",
-              animation: "slide_from_bottom",
-            }}
-          >
-            <Stack.Screen
-              name="ExpensesOverview"
-              component={ExpensesOverview}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="ManageExpense"
-              component={ManageExpense}
-              options={{
-                presentation: "modal",
-                title: "Manage Expense",
-              }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </ExpensesContextProvider>
+      <AuthContextProvider>
+        <ExpensesContextProvider>
+          <Navigation />
+        </ExpensesContextProvider>
+      </AuthContextProvider>
     </>
   );
 }

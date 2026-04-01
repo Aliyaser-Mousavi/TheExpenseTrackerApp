@@ -1,6 +1,7 @@
 import { useEffect, useContext, useState } from "react";
 import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
 import { ExpensesContext } from "../store/expenses-context";
+import { AuthContext } from "../store/auth-context";
 import { getDateMinusDays } from "../util/date";
 import { fetchExpense } from "../util/http";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
@@ -9,7 +10,9 @@ import ErrorOverlay from "../components/UI/ErrorOverlay";
 const RecentExpenses = () => {
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
+
   const expensesCtx = useContext(ExpensesContext);
+  const authCtx = useContext(AuthContext);
 
   function getErrorMessage(error) {
     if (error.message === "NO_INTERNET") {
@@ -22,7 +25,7 @@ const RecentExpenses = () => {
     async function getExpenses() {
       setIsFetching(true);
       try {
-        const expenses = await fetchExpense();
+        const expenses = await fetchExpense(authCtx.token, authCtx.userId);
         expensesCtx.setExpenses(expenses);
       } catch (error) {
         setError(getErrorMessage(error));
@@ -31,7 +34,7 @@ const RecentExpenses = () => {
     }
 
     getExpenses();
-  }, []);
+  }, [authCtx.token, authCtx.userId]);
 
   function errorHandler() {
     setError(null);
